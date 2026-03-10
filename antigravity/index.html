@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Daily Planner – A professional productivity dashboard to manage your tasks, track progress, and stay organized." />
+  <title>Daily Planner – Productivity Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">DayFlow</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">&#9776;</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard" id="nav-dashboard">
+        <span class="nav-icon">⊞</span>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-section="tasks" id="nav-tasks">
+        <span class="nav-icon">✔</span>
+        <span class="nav-label">My Tasks</span>
+      </a>
+      <a href="#" class="nav-item" data-section="calendar" id="nav-calendar">
+        <span class="nav-icon">◫</span>
+        <span class="nav-label">Calendar</span>
+      </a>
+      <a href="#" class="nav-item" data-section="statistics" id="nav-statistics">
+        <span class="nav-icon">⧉</span>
+        <span class="nav-label">Statistics</span>
+      </a>
+      <a href="#" class="nav-item" data-section="settings" id="nav-settings">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-label">Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-info">
+          <span class="user-name" id="userName">User</span>
+          <span class="user-role">Productivity Pro</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">&#9776;</button>
+        <div class="search-wrapper">
+          <span class="search-icon">⌕</span>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search tasks…" aria-label="Search tasks" />
+          <button class="search-clear" id="searchClear" aria-label="Clear search">✕</button>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="notif-btn" id="notifBtn" title="Enable Notifications" aria-label="Enable Notifications">
+          <span class="notif-icon">🔔</span>
+        </button>
+        <button class="add-task-btn" id="addTaskBtn">
+          <span>+</span> New Task
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== SECTIONS ===== -->
+
+    <!-- Dashboard Section -->
+    <section class="section active" id="section-dashboard">
+      <div class="section-header">
+        <div>
+          <h1 id="greetingMsg">Good Morning! 👋</h1>
+          <p class="section-subtitle">Here's what's on your plate today</p>
+        </div>
+        <div class="date-badge" id="dateBadge"></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" id="stat-total">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <span class="stat-value" id="totalCount">0</span>
+            <span class="stat-label">Total Tasks</span>
+          </div>
+          <div class="stat-bg-icon">📋</div>
+        </div>
+        <div class="stat-card green" id="stat-done">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <span class="stat-value" id="doneCount">0</span>
+            <span class="stat-label">Completed</span>
+          </div>
+          <div class="stat-bg-icon">✅</div>
+        </div>
+        <div class="stat-card orange" id="stat-pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <span class="stat-value" id="pendingCount">0</span>
+            <span class="stat-label">Pending</span>
+          </div>
+          <div class="stat-bg-icon">⏳</div>
+        </div>
+        <div class="stat-card purple" id="stat-overdue">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-info">
+            <span class="stat-value" id="overdueCount">0</span>
+            <span class="stat-label">Overdue</span>
+          </div>
+          <div class="stat-bg-icon">🚨</div>
+        </div>
+      </div>
+
+      <div class="progress-card">
+        <div class="progress-header">
+          <span class="progress-title">Today's Productivity</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+        <p class="progress-sub" id="progressSub">Keep it up! Start by adding your first task.</p>
+      </div>
+
+      <div class="dashboard-bottom">
+        <div class="recent-tasks-card">
+          <div class="card-header">
+            <h2>Recent Tasks</h2>
+            <a href="#" class="see-all" data-section="tasks">See All</a>
+          </div>
+          <div class="recent-tasks-list" id="recentTasksList">
+            <div class="empty-state small">No tasks yet. Create one!</div>
+          </div>
+        </div>
+
+        <div class="priority-breakdown-card">
+          <div class="card-header"><h2>Priority Breakdown</h2></div>
+          <div class="priority-chart-wrap">
+            <canvas id="priorityChart" width="200" height="200"></canvas>
+          </div>
+          <div class="priority-legend" id="priorityLegend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tasks Section -->
+    <section class="section" id="section-tasks">
+      <div class="section-header">
+        <div>
+          <h1>My Tasks</h1>
+          <p class="section-subtitle">Manage and organize all your tasks</p>
+        </div>
+      </div>
+
+      <div class="tasks-toolbar">
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+        <div class="filter-group">
+          <select class="filter-select" id="priorityFilter" aria-label="Filter by priority">
+            <option value="all">All Priorities</option>
+            <option value="high">🔴 High</option>
+            <option value="medium">🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </select>
+          <select class="filter-select" id="categoryFilter" aria-label="Filter by category">
+            <option value="all">All Categories</option>
+            <option value="work">💼 Work</option>
+            <option value="study">📚 Study</option>
+            <option value="personal">🏠 Personal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tasks-grid" id="tasksGrid">
+        <div class="empty-state" id="emptyTasksState">
+          <div class="empty-icon">🗒️</div>
+          <h3>No tasks yet</h3>
+          <p>Click "+ New Task" to get started</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section class="section" id="section-calendar">
+      <div class="section-header">
+        <div>
+          <h1>Calendar</h1>
+          <p class="section-subtitle">View your tasks by date</p>
+        </div>
+      </div>
+
+      <div class="calendar-layout">
+        <div class="calendar-card">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" id="prevMonth" aria-label="Previous month">&#8249;</button>
+            <h2 class="cal-month-title" id="calMonthTitle"></h2>
+            <button class="cal-nav-btn" id="nextMonth" aria-label="Next month">&#8250;</button>
+          </div>
+          <div class="cal-weekdays">
+            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+        <div class="cal-tasks-card">
+          <div class="card-header">
+            <h2>Tasks on <span id="calSelectedDate">—</span></h2>
+          </div>
+          <div class="cal-tasks-list" id="calTasksList">
+            <div class="empty-state small">Select a date to see tasks.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="section" id="section-statistics">
+      <div class="section-header">
+        <div>
+          <h1>Statistics</h1>
+          <p class="section-subtitle">Insights into your productivity</p>
+        </div>
+      </div>
+
+      <div class="stats-charts-grid">
+        <div class="chart-card">
+          <h3>Task Completion</h3>
+          <div class="chart-wrap">
+            <canvas id="completionChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>By Category</h3>
+          <div class="chart-wrap">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card full-width">
+          <h3>Weekly Productivity</h3>
+          <div class="chart-wrap tall">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-summary-grid">
+        <div class="summary-card">
+          <span class="summary-icon">🏆</span>
+          <span class="summary-value" id="sCompleted">0</span>
+          <span class="summary-label">Tasks Completed</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-icon">⚡</span>
+          <span class="summary-value" id="sRate">0%</span>
+          <span class="summary-label">Completion Rate</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-icon">🔥</span>
+          <span class="summary-value" id="sStreak">0</span>
+          <span class="summary-label">Day Streak</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-icon">📌</span>
+          <span class="summary-value" id="sHighPriority">0</span>
+          <span class="summary-label">High Priority Done</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section class="section" id="section-settings">
+      <div class="section-header">
+        <div>
+          <h1>Settings</h1>
+          <p class="section-subtitle">Customize your experience</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Appearance</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Dark Mode</span>
+              <span class="setting-desc">Switch between light and dark theme</span>
+            </div>
+            <label class="toggle-switch" aria-label="Toggle dark mode">
+              <input type="checkbox" id="darkModeToggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Accent Color</span>
+              <span class="setting-desc">Choose your preferred accent color</span>
+            </div>
+            <div class="color-swatches">
+              <button class="swatch active" data-color="violet" style="background:#7c3aed" title="Violet" aria-label="Violet theme"></button>
+              <button class="swatch" data-color="blue" style="background:#2563eb" title="Blue" aria-label="Blue theme"></button>
+              <button class="swatch" data-color="emerald" style="background:#059669" title="Emerald" aria-label="Emerald theme"></button>
+              <button class="swatch" data-color="rose" style="background:#e11d48" title="Rose" aria-label="Rose theme"></button>
+              <button class="swatch" data-color="amber" style="background:#d97706" title="Amber" aria-label="Amber theme"></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Notifications</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Browser Notifications</span>
+              <span class="setting-desc">Get reminders for due tasks</span>
+            </div>
+            <label class="toggle-switch" aria-label="Toggle notifications">
+              <input type="checkbox" id="notifToggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Profile</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Display Name</span>
+              <span class="setting-desc">How you'll be greeted</span>
+            </div>
+            <input type="text" class="setting-input" id="displayNameInput" placeholder="Your name" maxlength="30" />
+          </div>
+          <button class="btn-primary save-name-btn" id="saveNameBtn">Save Name</button>
+        </div>
+
+        <div class="settings-card danger-card">
+          <h3>Data</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Clear All Tasks</span>
+              <span class="setting-desc">Permanently delete all tasks — this cannot be undone</span>
+            </div>
+            <button class="btn-danger" id="clearAllBtn">Clear All</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Export Tasks (JSON)</span>
+              <span class="setting-desc">Download a backup of your tasks</span>
+            </div>
+            <button class="btn-secondary" id="exportBtn">Export</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== ADD / EDIT TASK MODAL ===== -->
+  <div class="modal-overlay" id="taskModalOverlay">
+    <div class="modal" id="taskModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h2 id="modalTitle">New Task</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close modal">✕</button>
+      </div>
+      <form class="modal-body" id="taskForm" novalidate>
+        <input type="hidden" id="taskId" />
+        <div class="form-group">
+          <label for="taskTitle">Task Title *</label>
+          <input type="text" id="taskTitle" placeholder="e.g. Finish project report" maxlength="80" required />
+        </div>
+        <div class="form-group">
+          <label for="taskDesc">Description</label>
+          <textarea id="taskDesc" placeholder="Add more details…" rows="3" maxlength="300"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskDueDate">Due Date</label>
+            <input type="date" id="taskDueDate" />
+          </div>
+          <div class="form-group">
+            <label for="taskPriority">Priority</label>
+            <select id="taskPriority">
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="taskCategory">Category</label>
+          <select id="taskCategory">
+            <option value="work">💼 Work</option>
+            <option value="study">📚 Study</option>
+            <option value="personal">🏠 Personal</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn-primary" id="modalSave">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== CONFIRM DIALOG ===== -->
+  <div class="modal-overlay" id="confirmOverlay">
+    <div class="modal confirm-modal" id="confirmModal" role="dialog" aria-modal="true">
+      <div class="confirm-icon" id="confirmIcon">⚠️</div>
+      <h3 id="confirmTitle">Are you sure?</h3>
+      <p id="confirmMsg">This action cannot be undone.</p>
+      <div class="confirm-btns">
+        <button class="btn-secondary" id="confirmCancel">Cancel</button>
+        <button class="btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
